@@ -14,8 +14,11 @@ import sys
 def get_instagram():
     taeri = 'taeri__taeri'
     if len(sys.argv) > 1:
-        taeri = ' '.join(sys.argv[1:])
-    print('looking for {}...'.format(taeri))
+        if sys.argv[1] != '-t':
+            taeri = ' '.join(sys.argv[1:])
+        else: # if test mode
+            taeri = ' '.join(sys.argv[2:])
+    print('Looking for {}...'.format(taeri))
     instagram = 'https://www.instagram.com/{}/?hl=en'.format(taeri)
     return instagram
 
@@ -25,7 +28,6 @@ def test(instagram):
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
     driver = webdriver.Chrome(options=options)
-    print('Generating Insta-styled padded picture...')
     # get url
     try:
         driver.get(instagram)
@@ -41,24 +43,26 @@ def test(instagram):
         pic_name = 'taeri/{}.jpg'.format(uuid.uuid4().hex)
         urllib.request.urlretrieve(pic_url, pic_name)
 
-        print('len of Nnq7C weEfm: {}'.format(len(Nnq7C_weEfm)))
-        print('random 1: {}'.format(rand_1))
-        print('lem of viNh3_kIKUG____bz0w: {}'.format(len(v1Nh3_kIKUG___bz0w)))
-        print('random 2: {}'.format(rand_2))
-        
         height  = 2 * ctypes.windll.user32.GetSystemMetrics(1)
         width = 2 * ctypes.windll.user32.GetSystemMetrics(0)
-        print('h: {}'.format(height))
-        print('w: {}'.format(width))
+
+        if sys.argv[1] == '-t':
+            print('len of Nnq7C weEfm: {}'.format(len(Nnq7C_weEfm)))
+            print('random 1: {}'.format(rand_1))
+            print('lem of viNh3_kIKUG____bz0w: {}'.format(len(v1Nh3_kIKUG___bz0w)))
+            print('random 2: {}'.format(rand_2))
+            print('h: {}'.format(height))
+            print('w: {}'.format(width))
         driver.close()
     except Exception:
         driver.close()
-        print((str)(Exception))
+        print('Sorry that an error occurred! Try other one!')
         exit()
     return pic_name
 
 
 def picy(pic_name):
+    print('Generating Insta-styled padded picture...')
     pic_ds = cv2.imread(pic_name)
     pic_ds_ori = pic_ds
     
@@ -66,9 +70,10 @@ def picy(pic_name):
     win_height = 2 * ctypes.windll.user32.GetSystemMetrics(1)
     width  = len(pic_ds[0])
     height = len(pic_ds)
-    print('height:\t{}'.format(len(pic_ds)))
-    print('width:\t{}'.format(len(pic_ds[0])))
-    print('pixel:\t{}'.format(len(pic_ds[0][0])))
+    if sys.argv[1] == '-t':
+        print('height:\t{}'.format(len(pic_ds)))
+        print('width:\t{}'.format(len(pic_ds[0])))
+        print('pixel:\t{}'.format(len(pic_ds[0][0])))
     pic_ds = np.reshape(pic_ds, (-1,3))
     kmeans = sklearn.cluster.KMeans(10).fit(pic_ds)
     colors = kmeans.cluster_centers_
@@ -86,12 +91,14 @@ def picy(pic_name):
     left   = (int)((win_width  - width)  / 2)
     right  = (int)((win_width  - width)  / 2)
     ideal  = colors[lightest]
-    print('top: {}; botton: {}; left: {}; right: {}'.format(top, bottom, left, right))
-    print('ideal color: [{}, {}, {}]'.format(ideal[0], ideal[1], ideal[2]))
+    if sys.argv[1] == '-t':
+        print('top: {}; botton: {}; left: {}; right: {}'.format(top, bottom, left, right))
+        print('ideal color: [{}, {}, {}]'.format(ideal[0], ideal[1], ideal[2]))
     pic_ds = cv2.copyMakeBorder(pic_ds_ori, top, bottom, left, right, borderType=cv2.BORDER_CONSTANT, value=[(int)(ideal[0]), (int)(ideal[1]), (int)(ideal[2])])
     cv2.imwrite(pic_name, pic_ds)
     pic_name = os.path.abspath(pic_name)
-    print('pic_dir: {}'.format(pic_name))
+    print('Picture saved at {}'.format(pic_name))
+    print('Just press Win+D and enjoy your adored one. XD')
     return pic_name
 
 
