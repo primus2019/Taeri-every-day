@@ -8,37 +8,64 @@ import numpy as np
 import sklearn.cluster
 import ctypes
 import os
+import sys
 
-instagram = 'https://www.instagram.com/taeri__taeri/?hl=en'
 
-def test():
+def get_instagram():
+    taeri = 'taeri__taeri'
+    if len(sys.argv) > 1:
+        taeri = ' '.join(sys.argv[1:])
+    print('looking for {}...'.format(taeri))
+    instagram = 'https://www.instagram.com/{}/?hl=en'.format(taeri)
+    return instagram
+
+
+def test(instagram):
     options = Options()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
-    driver = webdriver.Chrome(chrome_options=options)
-    driver.get(instagram)
-    Nnq7C_weEfm = driver.find_elements_by_xpath('//*[@id="react-root"]/section/main/div/div[3]/article/div[1]/div/*[self::div]')
-    # print('len of Nnq7C weEfm: {}'.format(len(Nnq7C_weEfm)))
-    rand_1 = random.randint(0, len(Nnq7C_weEfm) - 1)
-    print('random 1: {}'.format(rand_1))
-    v1Nh3_kIKUG___bz0w = Nnq7C_weEfm[rand_1].find_elements_by_tag_name('a')
-    # print('lem of viNh3_kIKUG____bz0w: {}'.format(len(v1Nh3_kIKUG___bz0w)))
-    rand_2 = random.randint(0, len(v1Nh3_kIKUG___bz0w) - 1)
-    print('random 2: {}'.format(rand_2))
-    pic_link           = v1Nh3_kIKUG___bz0w[rand_2].get_attribute('href')
-    driver.get(pic_link)
-    
-    pic_url = driver.find_elements_by_tag_name('img')[1].get_attribute('src')
-    pic_name = 'taeri/{}.jpg'.format(uuid.uuid4().hex)
-    urllib.request.urlretrieve(pic_url, pic_name)
+    driver = webdriver.Chrome(options=options)
+    print('Generating Insta-styled padded picture...')
+    # get url
+    try:
+        driver.get(instagram)
+        # get pic_url
+        Nnq7C_weEfm = driver.find_elements_by_xpath('//*[@id="react-root"]/section/main/div/div[3]/article/div[1]/div/*[self::div]')
+        rand_1 = len(Nnq7C_weEfm) - random.randint(0, len(Nnq7C_weEfm) - 1)
+        v1Nh3_kIKUG___bz0w = Nnq7C_weEfm[rand_1].find_elements_by_tag_name('a')
+        rand_2 = random.randint(0, len(v1Nh3_kIKUG___bz0w) - 1)
+        pic_link           = v1Nh3_kIKUG___bz0w[rand_2].get_attribute('href')
+        driver.get(pic_link)
+        pic_url = driver.find_elements_by_tag_name('img')[1].get_attribute('src')
+        # set pic_name
+        pic_name = 'taeri/{}.jpg'.format(uuid.uuid4().hex)
+        urllib.request.urlretrieve(pic_url, pic_name)
+
+        print('len of Nnq7C weEfm: {}'.format(len(Nnq7C_weEfm)))
+        print('random 1: {}'.format(rand_1))
+        print('lem of viNh3_kIKUG____bz0w: {}'.format(len(v1Nh3_kIKUG___bz0w)))
+        print('random 2: {}'.format(rand_2))
+        
+        height  = 2 * ctypes.windll.user32.GetSystemMetrics(1)
+        width = 2 * ctypes.windll.user32.GetSystemMetrics(0)
+        print('h: {}'.format(height))
+        print('w: {}'.format(width))
+        driver.close()
+    except Exception:
+        driver.close()
+        print((str)(Exception))
+        exit()
     return pic_name
 
 
 def picy(pic_name):
     pic_ds = cv2.imread(pic_name)
     pic_ds_ori = pic_ds
-    height = len(pic_ds)
+    
+    win_width  = 2 * ctypes.windll.user32.GetSystemMetrics(0)
+    win_height = 2 * ctypes.windll.user32.GetSystemMetrics(1)
     width  = len(pic_ds[0])
+    height = len(pic_ds)
     print('height:\t{}'.format(len(pic_ds)))
     print('width:\t{}'.format(len(pic_ds[0])))
     print('pixel:\t{}'.format(len(pic_ds[0][0])))
@@ -53,11 +80,11 @@ def picy(pic_name):
     for rgb in colors:
         colors_vote.append((int)(rgb[0] + rgb[1] + rgb[2]))
     lightest = np.argmax(colors_vote)
-    print(colors)
-    top    = (int)((1824 - height) / 2)
-    bottom = (int)((1824 - height) / 2)
-    left   = (int)((2736 - width) / 2)
-    right  = (int)((2736 - width) / 2)
+    # print(colors)
+    top    = (int)((win_height - height) / 2)
+    bottom = (int)((win_height - height) / 2)
+    left   = (int)((win_width  - width)  / 2)
+    right  = (int)((win_width  - width)  / 2)
     ideal  = colors[lightest]
     print('top: {}; botton: {}; left: {}; right: {}'.format(top, bottom, left, right))
     print('ideal color: [{}, {}, {}]'.format(ideal[0], ideal[1], ideal[2]))
@@ -73,6 +100,7 @@ def setPaper(pic_dir):
 
 
 if __name__ == '__main__':
-    pic_name = test()
-    pic_dir = picy(pic_name)
+    instagram = get_instagram()
+    pic_name  = test(instagram)
+    pic_dir   = picy(pic_name)
     setPaper(pic_dir)
