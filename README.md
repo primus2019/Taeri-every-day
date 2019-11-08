@@ -7,21 +7,25 @@ Randomly change background picture from Kang Tae-ri's Instagram, Insta-styled pa
 4. (last but most important) adoration to Kang Tae-ri
 
 ## Usage
-### For Kang Tae-ri: 
+### Random crawler
+#### For Kang Tae-ri: 
 Type this in command line: 
 ```
 taeri
 ```
-or 
-```
-python Taeri-every-day.py
-```
-### For others: 
+#### For others: 
 Type this in command line: 
 ```
 taeri [someone's Instagram nickname]
 ```
-or
+### Specific crawler
+If you want to sett specific picture as wallpaper, apply this.
+#### For Kang Tae-ri:
+Click the picture and copy the url of picture popup
+![download from link](misc/download_from_link.png)
+Then type this in command line:
 ```
-python Taeri-every-day.py [someone's Instagram nickname]
+taeri -u [url of picture popup]
 ```
+#### For others:
+Do the same as above.
