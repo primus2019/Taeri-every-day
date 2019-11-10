@@ -11,12 +11,14 @@ import os
 import sys
 
 
+exceptions = ['-t', '-u', '-p']
+
 def get_instagram():
     taeri = 'taeri__taeri'
     if len(sys.argv) > 1:
-        if sys.argv[1] != '-t':
+        if sys.argv[1] not in exceptions:
             taeri = ' '.join(sys.argv[1:])
-        else: # if test mode
+        else: 
             taeri = ' '.join(sys.argv[2:])
     print('Looking for {}...'.format(taeri))
     instagram = 'https://www.instagram.com/{}/?hl=en'.format(taeri)
@@ -100,12 +102,12 @@ def picy(pic_name):
     cv2.imwrite(pic_name, pic_ds)
     pic_name = os.path.abspath(pic_name)
     print('Picture saved at {}'.format(pic_name))
-    print('Just press Win+D and enjoy your adored one. XD')
     return pic_name
 
 
 def setPaper(pic_dir):
     ctypes.windll.user32.SystemParametersInfoW(20, 0, pic_dir, 0)
+    print('Just press Win+D and enjoy your adored one. XD')
 
 
 if __name__ == '__main__':
@@ -113,8 +115,15 @@ if __name__ == '__main__':
         url = sys.argv[2]
         print('Getting picture from {}...'.format(sys.argv[2]))
         pic_name  = test(url=url)
+        pic_dir   = picy(pic_name)
+        setPaper(pic_dir)
+    elif len(sys.argv) == 3 and sys.argv[1] == '-p':
+        print('Setting from path...')
+        setPaper(os.path.abspath('taeri/{}.jpg'.format(sys.argv[2])))
+    # elif len(sys.argv) == 3 and sys.argv[1] == '-l':
+    #     setPaper(os.path.abspath('taeri/{}'.format(sys.argv[2])))
     else:
         instagram = get_instagram()
         pic_name  = test(instagram)
-    pic_dir   = picy(pic_name)
-    setPaper(pic_dir)
+        pic_dir   = picy(pic_name)
+        setPaper(pic_dir)

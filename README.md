@@ -29,3 +29,8 @@ taeri -u [url of picture popup]
 ```
 #### For others:
 Do the same as above.
+### Set wallpaper from folder taeri
+Copy the filename and type this: 
+```
+taeri -p 3f2bcb2fc27e42438b0060692d0362f0(which is the uuid-named wallpaper in taeri folder)
+```
