@@ -9,17 +9,17 @@ import sklearn.cluster
 import ctypes
 import os
 import sys
+import time
 
 
-exceptions = ['-t', '-u', '-p']
+exceptions = ['-t', '-u', '-p', '-s']
 
 def get_instagram():
     taeri = 'taeri__taeri'
-    if len(sys.argv) > 1:
-        if sys.argv[1] not in exceptions:
-            taeri = ' '.join(sys.argv[1:])
-        else: 
-            taeri = ' '.join(sys.argv[2:])
+    if len(sys.argv) > 1 and sys.argv[1] not in exceptions:
+        taeri = ' '.join(sys.argv[1:])
+    elif len(sys.argv) > 2 and sys.argv[1] in exceptions:
+        taeri = ' '.join(sys.argv[2:])
     print('Looking for {}...'.format(taeri))
     instagram = 'https://www.instagram.com/{}/?hl=en'.format(taeri)
     return instagram
@@ -35,6 +35,8 @@ def test(instagram='https://www.instagram.com/taeri__taeri/', url=None):
     try:
         if url == None:
             driver.get(instagram)
+            # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            # time.sleep(5)
             # get pic_url
             Nnq7C_weEfm = driver.find_elements_by_xpath('//*[@id="react-root"]/section/main/div/div[3]/article/div[1]/div/*[self::div]')
             rand_1 = len(Nnq7C_weEfm) - random.randint(0, len(Nnq7C_weEfm) - 1)
@@ -43,6 +45,7 @@ def test(instagram='https://www.instagram.com/taeri__taeri/', url=None):
             pic_link           = v1Nh3_kIKUG___bz0w[rand_2].get_attribute('href')
         else:
             pic_link = url
+            print('Getting picture from {}...'.format(url))
         driver.get(pic_link)
         pic_url = driver.find_elements_by_tag_name('img')[1].get_attribute('src')
         # set pic_name
@@ -106,22 +109,37 @@ def picy(pic_name):
 
 
 def setPaper(pic_dir):
+    print('Setting from path {}'.format(pic_dir))
     ctypes.windll.user32.SystemParametersInfoW(20, 0, pic_dir, 0)
     print('Just press Win+D and enjoy your adored one. XD')
 
 
+def selectLocal():
+    pic_dirs = []
+    for idx, (dirpath, dirnames, filenames) in enumerate(os.walk('taeri/')):
+        pic_dirs.extend(filenames)
+    for idx, filename in enumerate(pic_dirs[1:]):
+        print('{}. {}'.format(idx + 1, filename))
+    selection = (int)(input('Select from pictures: ')) - 1
+    assert selection < len(pic_dirs), 'Selection out of range: {} out of {}'.format(selection, len(pic_dirs))
+    return os.path.abspath('taeri/' + pic_dirs[selection])
+
+
 if __name__ == '__main__':
-    if len(sys.argv) == 3 and sys.argv[1] == '-u':
+    if len(sys.argv) == 3 and sys.argv[1] == '-u':      # by url
         url = sys.argv[2]
-        print('Getting picture from {}...'.format(sys.argv[2]))
         pic_name  = test(url=url)
         pic_dir   = picy(pic_name)
         setPaper(pic_dir)
-    elif len(sys.argv) == 3 and sys.argv[1] == '-p':
-        print('Setting from path...')
+    elif len(sys.argv) == 3 and sys.argv[1] == '-p':    # by path
         setPaper(os.path.abspath('taeri/{}.jpg'.format(sys.argv[2])))
-    # elif len(sys.argv) == 3 and sys.argv[1] == '-l':
-    #     setPaper(os.path.abspath('taeri/{}'.format(sys.argv[2])))
+    elif len(sys.argv) == 2 and sys.argv[1] == '-s':    # by selection
+        setPaper(selectLocal())
+    elif len(sys.argv) in [1, 2]:                       # simplest situation
+        instagram = get_instagram()
+        pic_name  = test(instagram)
+        pic_dir   = picy(pic_name)
+        setPaper(pic_dir)
     else:
         instagram = get_instagram()
         pic_name  = test(instagram)
