@@ -12,7 +12,7 @@ import sys
 import time
 
 
-exceptions = ['-t', '-u', '-p', '-s']
+exceptions = ['-t', '-u', '-p', '-s', '-g', '-l']
 
 def get_instagram():
     taeri = 'taeri__taeri'
@@ -130,6 +130,11 @@ if __name__ == '__main__':
         url = sys.argv[2]
         pic_name  = test(url=url)
         pic_dir   = picy(pic_name)
+        setPaper(pic_dir)
+    elif len(sys.argv) == 2 and sys.argv[1] == '-l':    # just display whats in taeri/
+        selectLocal()
+    elif len(sys.argv) == 3 and sys.argv[1] == '-g':    # generate by jpg in taeri/
+        pic_dir = picy('taeri/' + sys.argv[2])
         setPaper(pic_dir)
     elif len(sys.argv) == 3 and sys.argv[1] == '-p':    # by path
         setPaper(os.path.abspath('taeri/{}.jpg'.format(sys.argv[2])))
